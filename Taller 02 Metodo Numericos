@@ -1,0 +1,67 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Constantes del problema
+g = 9.81
+s0, m, k = 300.0, 0.25, 0.1
+
+def s(t):
+    """Función de la altura en función del tiempo t."""
+    return s0 - (m * g / k) * t + (m ** 2 * g / k ** 2) * (1 - np.exp(-k * t / m))
+
+def biseccion(f, a, b, TOL=1e-4):
+    """
+    Encuentra la raíz de f(x) en el intervalo [a, b] con una tolerancia TOL.
+    Retorna la raíz aproximada y el historial de iteraciones para graficar.
+    """
+    historia = []
+    
+    # Verificación del teorema del valor medio / cambio de signo
+    if f(a) * f(b) >= 0:
+        raise ValueError("El intervalo no es válido: no hay cambio de signo en los extremos.")
+    
+    # Bucle principal del método de bisección
+    while (b - a) > TOL:
+        p = (a + b) / 2.0
+        historia.append((a, b, p))  # Registra el intervalo y el punto medio actual
+        
+        if f(a) * f(p) < 0:
+            b = p  # La raíz está en el subintervalo izquierdo
+        else:
+            a = p  # La raíz está en el subintervalo derecho
+            
+    return p, historia
+
+def graficar(t_star, historia, k_iteracion=None, archivo="caida.png"):
+    """
+    Dibuja s(t). Si k_iteracion no es None, resalta el intervalo [a, b] 
+    de esa iteración (1-based) y su punto medio p.
+    """
+    t = np.linspace(0, 20, 400)
+    plt.figure(figsize=(9, 4.5))
+    plt.plot(t, s(t), label="s(t)")
+    plt.axhline(0, color="gray", linestyle="--", linewidth=1)
+    
+    if k_iteracion is not None:
+        a, b, p = historia[k_iteracion - 1]
+        plt.axvspan(a, b, color="green", alpha=0.25, label=f"iter {k_iteracion}: [{a:.4g}, {b:.4g}]")
+        plt.axvline(p, color="green", linestyle=":", linewidth=1)
+        
+    plt.plot(t_star, 0, "ro", label=f"t* = {t_star:.4f}")
+    plt.xlabel("t (s)")
+    plt.ylabel("s(t) (m)")
+    plt.title("Caída con resistencia del aire")
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(archivo, dpi=150)
+    plt.show()
+
+# Ejecución del algoritmo y generación de la gráfica
+t_star, historia = biseccion(s, 0.0, 20.0, TOL=1e-4)
+
+# Respuestas a las preguntas del ejercicio
+print(f"Tiempo en llegar al piso (6 decimales): {t_star:.6f} s")
+print(f"Número total de iteraciones realizadas: {len(historia)}")
+
+# Generación del gráfico resaltando la iteración 3
+graficar(t_star, historia, k_iteracion=3)
