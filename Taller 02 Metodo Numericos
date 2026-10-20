@@ -6,14 +6,11 @@ g = 9.81
 s0, m, k = 300.0, 0.25, 0.1
 
 def s(t):
-    """Función de la altura en función del tiempo t."""
+   
     return s0 - (m * g / k) * t + (m ** 2 * g / k ** 2) * (1 - np.exp(-k * t / m))
 
 def biseccion(f, a, b, TOL=1e-4):
-    """
-    Encuentra la raíz de f(x) en el intervalo [a, b] con una tolerancia TOL.
-    Retorna la raíz aproximada y el historial de iteraciones para graficar.
-    """
+ 
     historia = []
     
     # Verificación del teorema del valor medio / cambio de signo
@@ -33,10 +30,7 @@ def biseccion(f, a, b, TOL=1e-4):
     return p, historia
 
 def graficar(t_star, historia, k_iteracion=None, archivo="caida.png"):
-    """
-    Dibuja s(t). Si k_iteracion no es None, resalta el intervalo [a, b] 
-    de esa iteración (1-based) y su punto medio p.
-    """
+  
     t = np.linspace(0, 20, 400)
     plt.figure(figsize=(9, 4.5))
     plt.plot(t, s(t), label="s(t)")
